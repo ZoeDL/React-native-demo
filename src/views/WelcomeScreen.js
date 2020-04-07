@@ -1,38 +1,43 @@
-import React, {useState} from 'react'
-import { Text, Button, StyleSheet, View, Image } from 'react-native'
+import React, { useReducer } from 'react'
+import { View, Image } from 'react-native'
 import ColorBlock from './ColorBlock'
 
-const WelcomeScreen = () => {
-    const [red, setRed] = useState(0)
-    const [green, setGreen] = useState(0)
-    const [blue, setBlue] = useState(0)
-    const setColor = (color, increment) => {
-        switch (color) {
-            case 'red':
-                red + increment > 255 || red + increment < 0? null : setRed(red + increment)
-                break;
-            case 'green':
-                green + increment > 255 || green + increment < 0? null : setGreen(green + increment)
-                break;
-            case 'blue':
-                blue + increment > 255 || blue + increment < 0? null : setBlue(blue + increment)
-                break;
-            default:
-                break;
-        }
+const INCREMENT_AMOUNT = 15
+// what a reducer returns is an updated state
+const reducer = (state, action) => {
+    switch (action.type) {
+        case 'change_red':
+            return state.red + action.payload > 255 || state.red + action.payload < 0
+            ? state:
+            { ...state, red: state.red + action.payload }
+        case 'change_green':
+            return state.green + action.payload > 255 || state.green + action.payload < 0
+            ? state:
+            { ...state, green: state.green + action.payload }
+        case 'change_blue':
+            return state.blue + action.payload > 255 || state.blue + action.payload < 0
+            ? state:
+            { ...state, blue: state.blue + action.payload }
+        default:
+            return state
     }
 
+}
+
+const WelcomeScreen = () => {
+    const [state, dispatch] = useReducer(reducer, {red: 0, green: 0, blue: 0})
+    const { red, green, blue } = state
     return (
       <View>
         <ColorBlock color="Red"
-            handleMore={ () => setColor('red', 10) }
-            handleLess={ () => setColor('red', -10)}/>
+            handleMore={ () => dispatch({type: 'change_red', payload: INCREMENT_AMOUNT}) }
+            handleLess={ () => dispatch({type: 'change_red', payload: -INCREMENT_AMOUNT}) }/>
         <ColorBlock color="Green"
-            handleMore={ () => setColor('green', 10) }
-            handleLess={ () => setColor('green', -10)}/>
+            handleMore={ () => dispatch({type: 'change_green', payload: INCREMENT_AMOUNT}) }
+            handleLess={ () => dispatch({type: 'change_green', payload: -INCREMENT_AMOUNT}) }/>
         <ColorBlock color="Blue"
-            handleMore={ () => setColor('blue', 10) }
-            handleLess={ () => setColor('blue', -10)}/>
+            handleMore={ () => dispatch({type: 'change_blue', payload: INCREMENT_AMOUNT}) }
+            handleLess={ () => dispatch({type: 'change_blue', payload: -INCREMENT_AMOUNT}) }/>
         <Image style={{ height: 100, width: 100, backgroundColor: `rgb(${red}, ${green}, ${blue})`}}/>
       </View>
     );
